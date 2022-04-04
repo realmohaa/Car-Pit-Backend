@@ -20,20 +20,21 @@ router.post("/register", async (req,res) => {
 
         try {
             const savedUser = await newUser.save();
-            res.status(201).json(savedUser);
+            const {password, ...others } = savedUser._doc;
+            res.status(201).json(others);
         } catch(err){
             res.status(500).json(err);
         }
 
     } else {
-        res.status(401).json("Username, pwd, email, cannot be empty");
+        res.status(401).json("Username, Password and Email Cannot be empty");
     }
 })
 
 // login 
 router.post("/login", async (req,res) => {
     try {
-        const user = await User.findOne({ username: req.body.username });
+        const user = await User.findOne({ username: req.body.username }).select('+password');
         !user && res.status(401).json("Wrong Credentials");
         if(user) {
             const encPass = CryptoJs.AES.decrypt(user.password, process.env.ENCRYTION_SECRET);
@@ -44,7 +45,7 @@ router.post("/login", async (req,res) => {
 
              const accessToken = jwt.sign(
                 {
-                 id: user._id,
+                 id: user.id,
                  isAdmin: user.isAdmin,
                  isVerified: user.isVerified
                 },

@@ -12,9 +12,16 @@ router.get("/", verifyAdmin, async (req,res) => {
 // User
 router.get("/:id", verifyAuth, async(req,res) => {
     try {
-
+        await User.findById(req.params.id)
+            .exec()
+            .then(doc => {
+                res.status(200).json(doc); 
+            })
+            .catch((err) => {
+                res.status(500).json({error: err});
+            })
     } catch (err) {
-        res.status(500).status
+        res.status(500).json({error: err})
     }
 })
 

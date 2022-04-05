@@ -2,11 +2,30 @@ const router = require("express").Router();
 const { verifyAuth, verifyAdmin } = require("../middleware/JWTVerifier")
 const CryptoJs = require("crypto-js");
 const User = require("../models/User");
+const aqp = require("api-query-params");
 
 // All users 
 router.get("/", verifyAdmin, async (req,res) => {
-    const allUsers = await User.find().select('-password')
-    res.status(200).json(allUsers)
+    try {
+        const { filter, skip, limit, sort, projection, population } = aqp(req.query);
+
+        await User.find(filter)
+            .select('-password')
+            .skip(skip)
+            .limit(limit)
+            .sort(sort)
+            .select(projection)
+            .populate(population)
+            .exec((err, users) => {
+              if (err) {
+                return next(err);
+              }
+              res.status(200).json(users)
+            });
+
+    } catch (err) {
+        res.status(500).json({error: err})
+    }
 })
 
 // User
@@ -56,8 +75,5 @@ router.delete("/:id", verifyAuth, async (req,res) => {
         res.status(500).json(err);
     }
 })
-
-
-
 
 module.exports = router

@@ -22,20 +22,34 @@ const ProductSchema = new mongoose.Schema({
     },
 
     color: {
-        type: String,
+        type: [],
     },
 
     size: {
-        type: String,
+        type: [],
     },
 
     stock: {
         type: Number,
     },
 
-    price: {
+    retail_price: {
         type: Number,
         required: true,
+    },
+
+    wholesale_price: {
+        type: Number,
+        required: true,
+    },
+
+    profitInCurrency: {
+        type: Number,
+        percentage: Number
+    },
+
+    profitPercentage: {
+        type: Number,
     }
 
 }, {

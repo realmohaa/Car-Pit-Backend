@@ -7,8 +7,9 @@ const bodyParser = require("body-parser");
 
 dotenv.config();
 
-const userRoute = require("./api/routes/user");
 const authRoute = require("./api/routes/auth");
+const userRoute = require("./api/routes/user");
+const productRoute = require("./api/routes/product");
 
 mongoose
     .connect(process.env.MONGO_URL)
@@ -43,6 +44,7 @@ app.use((req, res, next) => {
 // Request Handeling routes
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
+app.use("/api/products", productRoute);
 
 // Global Errors Handeling 
 app.use((req, res, next) => {

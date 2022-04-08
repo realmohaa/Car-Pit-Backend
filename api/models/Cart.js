@@ -3,8 +3,8 @@ const mongoose = require("mongoose");
 const CartSchema = new mongoose.Schema({
     user_id: {
         type: String,
-        required: true,
-        unique: true
+        // required: true,
+        // unique: true
     },
 
     products: [

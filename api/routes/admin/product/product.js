@@ -1,9 +1,8 @@
 const router = require("express").Router();
-const { verifyAuth, verifyAdmin } = require("../middleware/JWTVerifier")
-const CryptoJs = require("crypto-js");
-const Product = require("../models/Product");
+const { verifyAdmin } = require("../../../middleware/JWTVerifier")
+const Product = require("../../../models/Product");
 const aqp = require("api-query-params");
-const createProductSchema = require("../validation/product_v_schema")
+const createProductSchema = require("../../../validation/product_v_schema")
 
 // All Products 
 router.get("/", verifyAdmin, async (req,res) => {
@@ -63,7 +62,7 @@ router.put("/:id", verifyAdmin, async (req, res,next) => {
 })
 
 // Delete Product
-router.delete("/:id", verifyAuth, async (req,res) => {
+router.delete("/:id", verifyAdmin, async (req,res) => {
     try {
         await Product.findByIdAndDelete(req.params.id);
         res.status(200).json({Status: "Deleted Successfully"});
@@ -79,6 +78,8 @@ router.get("/stats", verifyAdmin, async (req, res) => {
   
     try {
       const data = await Product.aggregate([
+        // Aggregating Needed Properties each month into 
+        // an object indicating analytics info
         { $match: { createdAt: { $gte: lastYear } } },
         {
           $addFields: {

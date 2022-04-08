@@ -7,9 +7,15 @@ const bodyParser = require("body-parser");
 
 dotenv.config();
 
+
+// Routes
 const authRoute = require("./api/routes/auth");
-const userRoute = require("./api/routes/user");
-const productRoute = require("./api/routes/product");
+// User Routes
+const cartRoute = require("./api/routes/user/cart/cart");
+const profileRoute = require("./api/routes/user/profile/profile");
+// Admin Routes
+const productAdminRoute = require("./api/routes/admin/product/product");
+const profileAdminRoute = require("./api/routes/admin/profile/admin_profile");
 
 mongoose
     .connect(process.env.MONGO_URL)
@@ -43,8 +49,12 @@ app.use((req, res, next) => {
 
 // Request Handeling routes
 app.use("/api/auth", authRoute);
-app.use("/api/users", userRoute);
-app.use("/api/products", productRoute);
+// User Handeling Routes
+app.use("/api/user/carts", cartRoute);
+app.use("/api/user/profile", profileRoute);
+// Admin Handeling Routes
+app.use("/api/admin/products", productAdminRoute);
+app.use("/api/admin/profile", profileAdminRoute);
 
 // Global Errors Handeling 
 app.use((req, res, next) => {

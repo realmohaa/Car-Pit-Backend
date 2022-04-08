@@ -14,5 +14,6 @@
 .env.example
 .env.development.local
 .env.test.local
+test.js
 
 npm-debug.log*

@@ -1,9 +1,9 @@
 const router = require("express").Router();
-const { verifyAdmin } = require("../../../middleware/JWTVerifier")
 const Cart = require("../../../models/Cart");
+const aqp = require("api-query-params");
 
 // All Carts 
-router.get("/", verifyAdmin, async (req,res) => {
+router.get("/", async (req,res) => {
     try {
         const { filter, skip, limit, sort, projection, population } = aqp(req.query);
 
@@ -24,6 +24,5 @@ router.get("/", verifyAdmin, async (req,res) => {
         res.status(500).json({error: err})
     }
 })
-
 
 module.exports = router

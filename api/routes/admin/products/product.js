@@ -1,11 +1,10 @@
 const router = require("express").Router();
-const { verifyAdmin } = require("../../../middleware/JWTVerifier")
 const Product = require("../../../models/Product");
 const aqp = require("api-query-params");
 const createProductSchema = require("../../../validation/product_v_schema")
 
 // All Products 
-router.get("/", verifyAdmin, async (req,res) => {
+router.get("/", async (req,res) => {
     try {
         const { filter, skip, limit, sort, projection, population } = aqp(req.query);
 
@@ -28,7 +27,7 @@ router.get("/", verifyAdmin, async (req,res) => {
 })
 
 // Create Product
-router.post("/", verifyAdmin, async (req, res, next) => {
+router.post("/", async (req, res, next) => {
     const newProduct = new Product({
         ...req.body,
         profitInCurrency: req.body.retail_price - req.body.wholesale_price,
@@ -45,11 +44,11 @@ router.post("/", verifyAdmin, async (req, res, next) => {
 })
 
 // Update Product
-router.put("/:id", verifyAdmin, async (req, res,next) => {
+router.put("/", async (req, res,next) => {
     try {
         const Validator = await createProductSchema.validateAsync(req.body);
         const updatedProduct = await Product.findByIdAndUpdate(
-            req.params.id, 
+            req.user.id, 
             {$set: req.body},
             {new: true}
         );
@@ -62,9 +61,9 @@ router.put("/:id", verifyAdmin, async (req, res,next) => {
 })
 
 // Delete Product
-router.delete("/:id", verifyAdmin, async (req,res) => {
+router.delete("/", async (req,res) => {
     try {
-        await Product.findByIdAndDelete(req.params.id);
+        await Product.findByIdAndDelete(req.user.id);
         res.status(200).json({Status: "Deleted Successfully"});
     } catch (err) {
         res.status(500).json(err);
@@ -72,7 +71,7 @@ router.delete("/:id", verifyAdmin, async (req,res) => {
 })
 
 // Products Stats
-router.get("/stats", verifyAdmin, async (req, res) => {
+router.get("/stats", async (req, res) => {
     const date = new Date();
     const lastYear = new Date(date.setFullYear(date.getFullYear() - 1));
   

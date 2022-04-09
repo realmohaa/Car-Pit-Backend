@@ -7,15 +7,18 @@ const bodyParser = require("body-parser");
 
 dotenv.config();
 
-
-// Routes
+// Auth Route
 const authRoute = require("./api/routes/auth");
 // User Routes
 const cartRoute = require("./api/routes/user/cart/cart");
 const profileRoute = require("./api/routes/user/profile/profile");
+const orderRoute = require("./api/routes/user/order/order");
 // Admin Routes
-const productAdminRoute = require("./api/routes/admin/product/product");
-const profileAdminRoute = require("./api/routes/admin/profile/admin_profile");
+const productAdminRoute = require("./api/routes/admin/products/product");
+const profileAdminRoute = require("./api/routes/admin/profiles/admin_profile");
+const orderAdminRoute = require("./api/routes/admin/orders/admin_order");
+const cartAdminRoute = require("./api/routes/admin/carts/admin_cart");
+const { verifyAuth, verifyAdmin } = require("./api/middleware/JWTVerifier");
 
 mongoose
     .connect(process.env.MONGO_URL)
@@ -27,10 +30,8 @@ mongoose
 
 // Use JSON
 app.use(express.json());
-
 // Use Morgan logging
 app.use(morgan('dev'));
-
 // Body Parser to extract urlEncoded Bodies to JSON
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json())
@@ -47,14 +48,19 @@ app.use((req, res, next) => {
     next();
 })
 
-// Request Handeling routes
+// Request Handeling routesW
 app.use("/api/auth", authRoute);
 // User Handeling Routes
+app.use("/api/user/", verifyAuth);
 app.use("/api/user/carts", cartRoute);
 app.use("/api/user/profile", profileRoute);
+app.use("/api/user/order", orderRoute);
 // Admin Handeling Routes
+app.use("/api/admin/", verifyAdmin);
 app.use("/api/admin/products", productAdminRoute);
-app.use("/api/admin/profile", profileAdminRoute);
+app.use("/api/admin/profiles", profileAdminRoute);
+app.use("/api/admin/orders", orderAdminRoute);
+app.use("/api/admin/carts", cartAdminRoute);
 
 // Global Errors Handeling 
 app.use((req, res, next) => {

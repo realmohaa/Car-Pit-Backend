@@ -1,10 +1,9 @@
 const router = require("express").Router();
-const { verifyAdmin } = require("../../../middleware/JWTVerifier")
 const User = require("../../../models/User");
 const aqp = require("api-query-params");
 
 // All users 
-router.get("/", verifyAdmin, async (req,res) => {
+router.get("/", async (req,res) => {
     try {
         const { filter, skip, limit, sort, projection, population } = aqp(req.query);
 
@@ -28,7 +27,7 @@ router.get("/", verifyAdmin, async (req,res) => {
 })
 
 // Users Stats
-router.get("/stats", verifyAdmin, async (req, res) => {
+router.get("/stats", async (req, res) => {
     const date = new Date();
     const lastYear = new Date(date.setFullYear(date.getFullYear() - 1));
   

@@ -7,6 +7,9 @@ const bodyParser = require("body-parser");
 
 dotenv.config();
 
+// JWT Role Verification Middleware
+const { verifyAuth, verifyAdmin } = require("./api/middleware/JWTVerifier");
+
 // Auth Route
 const authRoute = require("./api/routes/auth");
 // User Routes
@@ -18,7 +21,6 @@ const productAdminRoute = require("./api/routes/admin/products/product");
 const profileAdminRoute = require("./api/routes/admin/profiles/admin_profile");
 const orderAdminRoute = require("./api/routes/admin/orders/admin_order");
 const cartAdminRoute = require("./api/routes/admin/carts/admin_cart");
-const { verifyAuth, verifyAdmin } = require("./api/middleware/JWTVerifier");
 
 mongoose
     .connect(process.env.MONGO_URL)
@@ -48,7 +50,7 @@ app.use((req, res, next) => {
     next();
 })
 
-// Request Handeling routesW
+// Request Handeling routes
 app.use("/api/auth", authRoute);
 // User Handeling Routes
 app.use("/api/user/", verifyAuth);

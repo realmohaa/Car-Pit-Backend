@@ -29,6 +29,7 @@ router.get("/", async (req,res) => {
 // Create Product
 router.post("/", async (req, res, next) => {
     const newProduct = new Product({
+        user_id: req.user.id,
         ...req.body,
         profitInCurrency: req.body.retail_price - req.body.wholesale_price,
         profitPercentage: ((req.body.retail_price-req.body.wholesale_price)/req.body.wholesale_price*100).toFixed(2)

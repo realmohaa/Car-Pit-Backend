@@ -21,9 +21,38 @@ router.get("/", async (req,res) => {
             });
 
     } catch (err) {
-        res.status(500).json({error: err})
+        res.status(500).json({error: err});
     }
 })
+
+// Get Monthly Stats
+router.get("/stats", async (res,req) => {
+    const date = new Date();
+    const lastMonth = new Date(date.setMonth(date.getMonth() - 1));
+    const prevMonth = new Date(date.setMonth(lastMonth.getMonth() - 1));
+
+    try {
+        const data = await Order.aggregate([
+            { $match: { createdAt: { $gte: prevMonth } } },
+            {
+              $project: {
+                month: { $month: "$createdAt" },
+                sales: "$amount"
+              },
+            },
+            {
+              $group: {
+                _id: "$month",
+                total: { $sum: "$sales" },
+              },
+            },
+          ]);
+          res.status(200).json(data)
+    } catch (err){
+        res.status(500).json({error: err});
+    }
+})
+
 
 // Update Order
 router.put("/", async (req, res,next) => {
@@ -36,7 +65,7 @@ router.put("/", async (req, res,next) => {
         const updtOrder = updatedOrder._doc;
         res.status(200).json(updtOrder);
     } catch (err) {
-        res.status(500).json({error: err})
+        res.status(500).json({error: err});
     }
 })
 

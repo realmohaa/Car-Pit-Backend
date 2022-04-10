@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const CryptoJs = require("crypto-js");
 const User = require("../../../models/User");
+const UserOTPVerification = require("../../../models/UserOTPVerification");
 
 // Get Profile
 router.get("/", async(req,res) => {
@@ -15,6 +16,33 @@ router.get("/", async(req,res) => {
             })
     } catch (err) {
         res.status(500).json({error: err})
+    }
+})
+
+router.put("/verify", async (req,res) => {
+    const { otp } = req.body;
+    try {
+        
+        if(req.user.isVerified){
+            return res.status(403).json({message: "Your account is already verified!"})
+        }
+
+        const otpVerification = await UserOTPVerification.findOne({user_id: req.user.id});
+        
+        const encOtp = CryptoJs.AES.decrypt(otpVerification.otp, process.env.ENCRYTION_SECRET);
+        const originalOtp = encOtp.toString(CryptoJs.enc.Utf8);
+
+        if(otp === originalOtp){
+            await User.findByIdAndUpdate(
+                req.user.id,
+                {$set: {isVerified: true}},
+                {new: true}
+            )
+            return res.status(200).json({message: "Your account is verified successfully!"})
+        } 
+        return res.status(200).json({message: "The OTP Code Entered is Invalid"})
+    } catch(err) {
+        return res.status(403).json({error: err})
     }
 })
 

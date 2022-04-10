@@ -4,6 +4,7 @@ const CryptoJs = require("crypto-js");
 const jwt = require("jsonwebtoken");
 const {registerationSchema, loginSchema} = require("../validation/auth_v_schema");
 const { createSession } = require("../controllers/session_controller");
+const { sendOTPEmail } = require("../utils/otpHandeler");
 
 // Registeration 
 router.post("/register", async (req,res, next) => {
@@ -31,12 +32,17 @@ router.post("/register", async (req,res, next) => {
                 first_name: first_name,
                 last_name: last_name,
                 phone_number: phone_number,
+                isVerified: false
             });
     
             try {
-                const savedUser = await newUser.save();
-                const {password, ...others } = savedUser._doc;
-                res.status(201).json(others);
+                const savedUser = await newUser
+                    .save()
+                    .then((result) => {
+                        console.log(result);
+                        sendOTPEmail(result.email,result._id, next);
+                        return res.status(201).json(result);
+                    });
             } catch(err){
                 res.status(500).json(err);
             }

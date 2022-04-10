@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const morgan = require('morgan');
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 
 dotenv.config();
 
@@ -37,6 +38,8 @@ app.use(morgan('dev'));
 // Body Parser to extract urlEncoded Bodies to JSON
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json())
+// Cookie Parser
+app.use(cookieParser());
 
 // Appending All Incoming requests with Headers to prevent CORS errs
 app.use((req, res, next) => {

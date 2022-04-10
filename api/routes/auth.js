@@ -2,7 +2,8 @@ const router = require("express").Router();
 const User = require("../models/User");
 const CryptoJs = require("crypto-js");
 const jwt = require("jsonwebtoken");
-const {registerationSchema, loginSchema} = require("../validation/auth_v_schema")
+const {registerationSchema, loginSchema} = require("../validation/auth_v_schema");
+const { createSession } = require("../controllers/session_controller");
 
 // Registeration 
 router.post("/register", async (req,res, next) => {
@@ -55,32 +56,59 @@ router.post("/login", async (req, res, next) => {
         const { username, password } = req.body;
         const Validator = await loginSchema.validateAsync(req.body);
 
-        const user = await User.findOne({ username: req.body.username }).select('+password');
+        const user = await User.findOne({ username: username }).select('+password');
         !user && res.status(401).json("Wrong Credentials");
         if(user) {
             const encPass = CryptoJs.AES.decrypt(user.password, process.env.ENCRYTION_SECRET);
             const userPass = encPass.toString(CryptoJs.enc.Utf8);
-    
-            userPass !== req.body.password &&
+
+            userPass !== password &&
              res.status(401).json({message: "Please enter a valid password"});
 
-             const accessToken = jwt.sign(
+            const session = createSession(user.username)
+
+            const refresh_token = jwt.sign(
+                {
+                    id: user.id,
+                    isAdmin: user.isAdmin,
+                    isVerified: user.isVerified,
+                    sessionId: session.sessionId
+                },
+                process.env.JWT_SECRET,
+                {expiresIn: "20m"}
+            );
+
+            const access_token = jwt.sign(
                 {
                  id: user.id,
                  isAdmin: user.isAdmin,
-                 isVerified: user.isVerified
+                 isVerified: user.isVerified,
+                 sessionId: session.sessionId
                 },
                 process.env.JWT_SECRET,
-                {
-                    expiresIn: "1d"
-                }
-            )
+                {expiresIn: "10m"}
+            );
 
-            const {password, ...others } = user._doc;
+            // Set Access Token Cookie
+            res.cookie("access_token", access_token, {
+                maxAge: 30000, // 5 Mins
+                httpOnly: false,
+                secure: false,
+            });
+
+            // Set Refresh Token Cookie
+            res.cookie("refresh_token", refresh_token, {
+                maxAge: 30000, // 1 Year
+                httpOnly: false,
+                secure: false,
+            })
     
             return res.status(200).json({
-                ...others,
-                accessToken
+                session,
+                auth: { 
+                    access_token,
+                    refresh_token
+                }
             });
         }
     } catch (err) {

@@ -23,14 +23,13 @@ router.get("/", async (req,res) => {
     } catch (err) {
         res.status(500).json({error: err});
     }
-})
+});
 
 // Get Monthly Stats
-router.get("/stats", async (res,req) => {
+router.get("/stats", async (req,res) => {
     const date = new Date();
     const lastMonth = new Date(date.setMonth(date.getMonth() - 1));
     const prevMonth = new Date(date.setMonth(lastMonth.getMonth() - 1));
-
     try {
         const data = await Order.aggregate([
             { $match: { createdAt: { $gte: prevMonth } } },
@@ -51,8 +50,7 @@ router.get("/stats", async (res,req) => {
     } catch (err){
         res.status(500).json({error: err});
     }
-})
-
+});
 
 // Update Order
 router.put("/", async (req, res,next) => {
@@ -67,7 +65,7 @@ router.put("/", async (req, res,next) => {
     } catch (err) {
         res.status(500).json({error: err});
     }
-})
+});
 
 // Delete Order
 router.delete("/", async (req,res) => {
@@ -77,6 +75,6 @@ router.delete("/", async (req,res) => {
     } catch (err) {
         res.status(500).json(err);
     }
-})
+});
 
 module.exports = router

@@ -3,12 +3,27 @@ const Cart = require("../../../models/Cart");
 
 // Create Cart
 router.post("/", async (req, res, next) => {
-    const newCart = new Cart(req.body)
+    const cart = await Cart.findOne({
+        user_id: req.user.id,
+    })
+
+    if(cart){
+        return res.status(208).json({
+            message: "You already have a cart",
+            cart
+        });
+    } else {
+        const newCart = new Cart({
+            user_id: req.user.id,
+            ...req.body
+        })
+    }
+
     try {
         const savedCart = await newCart.save();
-        res.status(200).json(savedCart)
+        return res.status(200).json(savedCart)
     } catch (err) {
-        res.status(500).json({error: err})
+        return res.status(500).json({error: err})
     }
 })
 

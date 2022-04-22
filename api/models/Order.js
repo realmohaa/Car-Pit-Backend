@@ -12,6 +12,11 @@ const OrderSchema = new mongoose.Schema({
         unique: true
     },
 
+    garage_id: {
+        type: String,
+        required: true,
+    },
+
     products: [
         {
             product_id: {

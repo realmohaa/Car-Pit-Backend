@@ -80,4 +80,27 @@ router.delete("/", async (req,res) => {
     }
 })
 
+// Logout
+router.post("/logout", async (req,res) => {
+    try {
+        // Set Access Token Cookie
+        res.cookie("access_token", null, {
+            maxAge: 0,
+            httpOnly: true,
+            secure: false,
+            path: "/",
+        });
+
+        // Set Refresh Token Cookie
+        res.cookie("refresh_token", null, {
+            maxAge: 0,
+            httpOnly: true,
+            secure: false,  
+        })
+        res.status(200).json({Status: "logged out Successfully"});
+    } catch (err) {
+        res.status(500).json(err);
+    }
+})
+
 module.exports = router

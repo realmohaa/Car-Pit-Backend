@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 const morgan = require('morgan');
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ const authRoute = require("./api/routes/auth");
 const cartRoute = require("./api/routes/user/cart/cart");
 const profileRoute = require("./api/routes/user/profile/profile");
 const orderRoute = require("./api/routes/user/order/order");
+const carRoute = require("./api/routes/user/car/car");
 // Admin Routes
 const productAdminRoute = require("./api/routes/admin/products/product");
 const profileAdminRoute = require("./api/routes/admin/profiles/admin_profile");
@@ -41,17 +43,20 @@ app.use(bodyParser.json())
 // Cookie Parser
 app.use(cookieParser());
 
-// Appending All Incoming requests with Headers to prevent CORS errs
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "*");
-    if (req.method === "OPTIONS") {
-        // Supported Request Methods
-        res.header("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE");
-        return res.status(200).json({});
-    }
-    next();
-})
+// Using CORS
+app.use(cors({ origin: 'http://localhost:3000', withCredentials: true, credentials: true }));
+
+// // Appending All Incoming requests with Headers to prevent CORS errs
+// app.use((req, res, next) => {
+//     res.header("Access-Control-Allow-Origin", "*");
+//     res.header("Access-Control-Allow-Headers", "*");
+//     if (req.method === "OPTIONS") {
+//         // Supported Request Methods
+//         res.header("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE");
+//         return res.status(200).json({});
+//     }
+//     next();
+// })
 
 // Request Handeling routes
 app.use("/api/auth", authRoute);
@@ -60,7 +65,8 @@ app.use("/api/user/", verifyAuth);
 app.use("/api/user/carts", cartRoute);
 app.use("/api/user/profile", profileRoute);
 app.use("/api/user/order", orderRoute);
-// Admin Handeling Routes
+app.use("/api/user/cars", carRoute);
+// Admin Handling Routes
 app.use("/api/admin/", verifyAdmin);
 app.use("/api/admin/products", productAdminRoute);
 app.use("/api/admin/profiles", profileAdminRoute);
@@ -75,7 +81,7 @@ app.use((req, res, next) => {
 })
 
 app.use((error, req, res, next) => {
-    res.status(error.stats || 500);
+    res.status(error.status || 500);
     res.json({
         error: {
             message: error.message

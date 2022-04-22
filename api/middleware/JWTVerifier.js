@@ -16,8 +16,11 @@ const verifyToken = (req, res, next) => {
             } else if(err){
                 jwt.verify(refresh_token, process.env.JWT_SECRET,(err, user) => {
                     if(err) {
-                        res.status(403).json({error: "You are logged out"})
+                        res.cookie({path: '/'})
                     }
+
+                    res.clearCookie("access_token")
+                    res.clearCookie("refresh_token")
 
                     const newAccessToken = jwt.sign(
                         {
@@ -27,7 +30,7 @@ const verifyToken = (req, res, next) => {
                         sessionId: user.sessionId
                         },
                         process.env.JWT_SECRET,
-                        {expiresIn: "20m"}
+                        {expiresIn: "5m"}
                     )
 
                     const newRefreshToken = jwt.sign(
@@ -38,33 +41,31 @@ const verifyToken = (req, res, next) => {
                         sessionId: user.sessionId
                         },
                         process.env.JWT_SECRET,
-                        {expiresIn: "20m"}
+                        {expiresIn: "15m"}
                     )
-
-                    res.clearCookie("access_token")
-                    res.clearCookie("refresh_token")
 
                     // Set Access Token Cookie
                     res.cookie("access_token", newAccessToken, {
-                        maxAge: 30000, // 5 Mins
-                        httpOnly: false,
+                        maxAge: 300000, // 5 Mins
+                        httpOnly: true,
                         secure: false,
+                        path: "/",
                     });
             
                     // Set Refresh Token Cookie
                     res.cookie("refresh_token", newRefreshToken, {
-                        maxAge: 3.154e10, // 1 Year
-                        httpOnly: false,
+                        maxAge: 300000, // 5 Mins
+                        httpOnly: true,
                         secure: false,  
                     })
-
+                    console.log("refreshed")
                     req.user = user
                 })
                 next();
             }
         });
     } catch (err) {
-        next(err);
+        next("err");
     }
 }
 

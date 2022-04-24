@@ -3,6 +3,7 @@ const CreateHTTPError = require("http-errors");
 
 require('dotenv').config
 
+// Token Veriication 
 const verifyToken = (req, res, next) => {
     let access_token = req.cookies.access_token;
     let refresh_token = req.cookies.refresh_token;
@@ -28,6 +29,7 @@ const verifyToken = (req, res, next) => {
                         {
                         id: user.id,
                         isAdmin: user.isAdmin,
+                        accountType: user.accountType,
                         isVerified: user.isVerified,
                         sessionId: user.sessionId
                         },
@@ -39,6 +41,7 @@ const verifyToken = (req, res, next) => {
                         {
                         id: user.id,
                         isAdmin: user.isAdmin,
+                        accountType: user.accountType,
                         isVerified: user.isVerified,
                         sessionId: user.sessionId
                         },
@@ -71,6 +74,7 @@ const verifyToken = (req, res, next) => {
     }
 }
 
+// Verify Naormal User
 const verifyAuth = (req,res,next) => {
     try {
         verifyToken(req,res,() => {
@@ -83,6 +87,7 @@ const verifyAuth = (req,res,next) => {
     }
 }
 
+// Verify Admin
 const verifyAdmin = (req,res,next) => {
     verifyToken(req,res,() => {
         if(req.user.isAdmin) {
@@ -93,4 +98,16 @@ const verifyAdmin = (req,res,next) => {
     })
 }
 
-module.exports = { verifyToken, verifyAuth, verifyAdmin }
+// Verify Garage
+const verifyGarage = (req,res,next) => {
+    verifyToken(req, res, () => {
+        console.log(req.user.accountType)
+        if(req.user.accountType === "garage") {
+            next();
+        } else {
+            next(CreateHTTPError(500, "Not Authorized"));
+        }
+    });
+}
+
+module.exports = { verifyToken, verifyAuth, verifyAdmin, verifyGarage }

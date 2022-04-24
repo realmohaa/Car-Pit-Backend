@@ -1,11 +1,11 @@
 const router = require("express").Router();
 const Order = require("../../../models/Order");
-const { uuid } = require('uuidv4');
+const { v4: uuidv4 } = require('uuid');
 
 // Create Order
 router.post("/", async (req, res, next) => {
     const newOrder = new Order({
-        order_id: uuid(),
+        order_id: uuidv4(),
         ...req.body,
         user_id: req.user.id
     });

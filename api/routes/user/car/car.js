@@ -1,7 +1,6 @@
 const router = require("express").Router();
 const Car = require("../../../models/Car");
 const CarsProvider = require("../../../providers/CarsProvider");
-const aqp = require('api-query-params');
 const CreateHTTPError = require("http-errors");
 
 
@@ -45,23 +44,10 @@ router.post("/", async (req, res, next) => {
 // All Customer Cars 
 router.get("/", async (req,res) => {
     try {
-        const { filter, skip, limit, sort, projection, population } = aqp(req.query);
-
-        await Car.find(filter)
-            .skip(skip)
-            .limit(limit)
-            .sort(sort)
-            .select(projection)
-            .populate(population)
-            .exec((err, cars) => {
-              if (err) {
-                return next(err);
-              }
-              res.status(200).json(cars)
-            });
-
+        const allCars = await Car.find({user_id: req.user.id});
+        return res.status(200).json(allCars);
     } catch (err) {
-        throw CreateHTTPError(500, "Test")
+        throw CreateHTTPError(500, err)
     }
 })
 

@@ -7,6 +7,7 @@ const { createSession } = require("../controllers/session_controller");
 const { sendOTPEmail } = require("../utils/otpHandeler");
 const createError = require('http-errors');
 const { uploadProfile } = require("../controllers/uploads");
+const Garage = require("../models/Garage");
 
 // Registeration 
 router.post("/register", uploadProfile.single("profile_image"), async (req,res, next) => {
@@ -22,6 +23,7 @@ router.post("/register", uploadProfile.single("profile_image"), async (req,res, 
 
     try {
         const exisitingUser = await User.findOne({email: email, username: username});
+
         if(exisitingUser){
             return res.status(422).json({error:{message: "Account Exists"}})
         }
@@ -58,7 +60,7 @@ router.post("/register", uploadProfile.single("profile_image"), async (req,res, 
         if(err.isJoi === true) err.status = 422
         next(err);
     }
-})
+});
 
 // login 
 router.post("/login", async (req, res, next) => {
@@ -85,6 +87,7 @@ router.post("/login", async (req, res, next) => {
                  id: user.id,
                  isAdmin: user.isAdmin,
                  isVerified: user.isVerified,
+                 accountType: user.accountType,
                  sessionId: session.sessionId
                 },
                 process.env.JWT_SECRET,
@@ -96,6 +99,7 @@ router.post("/login", async (req, res, next) => {
                     id: user.id,
                     isAdmin: user.isAdmin,
                     isVerified: user.isVerified,
+                    accountType: user.accountType,
                     sessionId: session.sessionId
                 },
                 process.env.JWT_SECRET,
@@ -124,6 +128,6 @@ router.post("/login", async (req, res, next) => {
         if(err.isJoi === true) err.status = 422
         next(err)
     }
-})
+});
 
 module.exports = router

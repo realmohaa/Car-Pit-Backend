@@ -10,7 +10,7 @@ const GarageSchema = new mongoose.Schema({
         required: true
     },
     services: {
-        type: [],
+        type: Array,
         required: true,
     },
     legal_name: {
@@ -18,7 +18,7 @@ const GarageSchema = new mongoose.Schema({
         required: true,
     },
     location: {
-        type: {},
+        type: Object,
         required: true
     },
     license_no: {
@@ -32,6 +32,12 @@ const GarageSchema = new mongoose.Schema({
     subscription_rate: {
         type: Number,
         default: 5,
+        required: true
+    },
+    garage_status: {
+        type: String,
+        enum: ['active', 'pending', 'disabled'],
+        default: 'pending',
         required: true
     }
 }, {

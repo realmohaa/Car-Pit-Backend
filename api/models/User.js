@@ -40,7 +40,7 @@ const UserSchema = new mongoose.Schema({
         default: false
     },
 
-    account_type: {
+    accountType: {
         type: String,
         enum: ['user', 'admin', 'garage'],
         default: 'user'

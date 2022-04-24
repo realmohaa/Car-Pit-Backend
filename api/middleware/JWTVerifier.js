@@ -1,4 +1,6 @@
 const jwt = require("jsonwebtoken");
+const CreateHTTPError = require("http-errors");
+
 require('dotenv').config
 
 const verifyToken = (req, res, next) => {
@@ -61,22 +63,24 @@ const verifyToken = (req, res, next) => {
                     console.log("refreshed")
                     req.user = user
                 })
-                next();
+                next("dfgdfgdf");
             }
         });
-    } catch (err) {
-        next("err");
+    } catch (e) {
+        next(e);
     }
 }
 
 const verifyAuth = (req,res,next) => {
-    verifyToken(req,res,() => {
-        if(req.user.id || req.user.isAdmin) {
-            next()
-        } else {
-            res.status(403).json("You are not authorized")
-        }
-    })
+    try {
+        verifyToken(req,res,() => {
+            if(req.user.id || req.user.isAdmin) {
+                next()
+            }
+        })
+    } catch(e) {
+        next(CreateHTTPError(500, "Not Authorized"))
+    }
 }
 
 const verifyAdmin = (req,res,next) => {
@@ -84,8 +88,7 @@ const verifyAdmin = (req,res,next) => {
         if(req.user.isAdmin) {
             next();
         } else {
-            res.status(403).json("You are not authorized")
-            next()
+            next(CreateHTTPError(500, "Not Authorized"))
         }
     })
 }

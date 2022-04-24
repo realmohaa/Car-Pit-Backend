@@ -8,6 +8,7 @@ const registerationSchema = Joi.object({
     first_name: Joi.string().min(2).max(8),
     last_name: Joi.string().min(3).max(8),
     phone_number: Joi.string().min(7).max(15),
+    account_type: Joi.string(),
 });
 
 const loginSchema = Joi.object({

@@ -1,26 +1,26 @@
 const router = require("express").Router();
 const Car = require("../../../models/Car");
-const CarsProvider = require("../../../providers/CarsProvider") 
-const aqp = require('api-query-params')
+const CarsProvider = require("../../../providers/CarsProvider");
+const aqp = require('api-query-params');
+const CreateHTTPError = require("http-errors");
 
 
 // Create Car For A User
 router.post("/", async (req, res, next) => {
     const { vin } = req.query;
-
     try {
         // Check if Car exists in customer cars
         const car = await Car.findOne({
             user_id: req.user.id,
             vin: vin
         })
+
         if(car){
             return res.status(208).json({
                 message: "You already have this car added",
                 car
             });
         }
-
 
         let creation_params = {};
 
@@ -34,12 +34,11 @@ router.post("/", async (req, res, next) => {
             vin: vin,
             ...creation_params
         })
+
         const savedCar = await newCar.save();
-        console.log(savedCar)
         res.status(200).json(savedCar)
-        // console.log(carDetails)
     } catch (e) {
-        return res.status(500).json({error: e.toString()})
+        return next(e)
     }
 })
 
@@ -62,19 +61,68 @@ router.get("/", async (req,res) => {
             });
 
     } catch (err) {
-        res.status(500).json({error: err})
+        throw CreateHTTPError(500, "Test")
     }
 })
+
+// Check Exisiting User Car History
+router.get("/history", async(req,res, next) => {
+    const { vin } = req.query;
+    try {
+        // Check if Car exists in customer cars
+        const car = await Car.findOne({
+            user_id: req.user.id,
+            vin: vin
+        })
+
+        if(!car){
+            return res.status(500).json({
+                message: "Please Provide Your Own Car Details"
+            });
+        }
+
+        let history = {};
+
+        await new CarsProvider().carHistory(vin, (params) => {
+            history = params
+        })
+
+        res.status(200).json(history)
+
+    } catch(e) {
+        next(e);
+    }
+})
+
+// router.get("/whatCar/", async (req,res) => {
+//     const url = req.body;
+//     let searchResult;
+//     try {
+//         console.log(url)
+//         await new CarsProvider().whatCarIsThat(url, (result) => {
+//             searchResult = result
+//         })
+//         res.status(200).json(searchResult);
+//     } catch (e) {
+//         res.status(500).json({error: e.toString()})
+//     }
+// })
 
 // Get Car Data
 router.get("/single/", async (req, res,next) => {
     try {
         const car = await Car.findOne({
+            user_id: req.user.id,
             vin: req.query.vin
         });
+        
+        if(!car){
+            next(CreateHTTPError(404, "Car Not Found"))
+        }
+
         res.status(200).json(car);
-    } catch (err) {
-        res.status(500).json({error: err})
+    } catch (e) {
+        next(CreateHTTPError(500, "Test"))
     }
 })
 

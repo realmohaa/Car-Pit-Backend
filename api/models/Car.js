@@ -9,6 +9,9 @@ const CarSchema = new mongoose.Schema({
         type: String,
         unique: true
     },
+    img: {
+        type: String,
+    },
     make: {type: String,},
     model: {type: String,},
     engine: {type: String,},
@@ -21,7 +24,9 @@ const CarSchema = new mongoose.Schema({
     fuel_capacity: {type: String,},
     city_mileage: {type: String,},
     highway_mileage: {type: String,},
-    retail_price: {type: String,},
+    transmission_short: {type: String,},
+    standard_seating: {type: String,},
+    manufacturer_suggested_retail_price: {type: String,}
 }, {
     timestamps: true
 })

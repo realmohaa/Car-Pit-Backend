@@ -40,6 +40,12 @@ const UserSchema = new mongoose.Schema({
         default: false
     },
 
+    account_type: {
+        type: String,
+        enum: ['user', 'admin', 'garage'],
+        default: 'user'
+    },
+
     isAdmin: {
         type: Boolean,
         default: false

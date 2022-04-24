@@ -17,6 +17,7 @@ router.post("/register", uploadProfile.single("profile_image"), async (req,res, 
         first_name,
         last_name,
         phone_number,
+        account_type
     } = req.body;
 
     try {
@@ -38,6 +39,7 @@ router.post("/register", uploadProfile.single("profile_image"), async (req,res, 
             last_name: last_name,
             phone_number: phone_number,
             isVerified: false,
+            account_type: account_type,
             profile_image: req.file === undefined ? 'default.png'  : req.file.filename
         });
 
@@ -67,7 +69,7 @@ router.post("/login", async (req, res, next) => {
             next(createError(500,Validator.error));
            } 
         const user = await User.findOne({ username: username }).select('+password');
-        !user && res.status(401).json({error:{message: "Wrong Credentials"}});
+        !user && res.status(401).json({error:{message: "Please enter a valid email and password"}});
         
         if(user) {
             const encPass = CryptoJs.AES.decrypt(user.password, process.env.ENCRYTION_SECRET);

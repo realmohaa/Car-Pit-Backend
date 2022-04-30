@@ -6,10 +6,10 @@ const BASE_URL = process.env.CAR_API_URL;
 const API_KEY = process.env.CAR_API_KEY;
 const SHORTNER_URL = process.env.SHORTNER_URL;
 const SHORTNER_KEY = process.env.SHORTNER_KEY;
+
 const instance = axios.create({
     baseURL: BASE_URL,
 })
-
 class CarsProvider {
 
     constructor () { 
@@ -81,11 +81,12 @@ class CarsProvider {
         }
     }
 
-    plateDecoder = async (plate, callback) => {
+    plateDecoder = async (plate, state, callback) => {
         try {
-            await instance.get('/platedecoder?key=' + API_KEY + '&plate=' + plate)
+            await instance.get('/platedecoder?key=' + API_KEY + '&plate=' + plate + '&state=' + state)
                 .then(result => {
                     callback(result.data);
+                    console.log(result.data)
                 })
         } catch(e){
             console.log(e)
@@ -99,18 +100,6 @@ class CarsProvider {
             console.log(e)
         }
     }
-
-    // whatCarIsThat = async (url, callback) => {
-    //     console.log(url)
-    //     try {
-    //         await instance.post('/whatcaristhat?key=' + API_KEY, url)
-    //             .then(result => {
-    //                 callback(result.data);
-    //             })
-    //     } catch(e){
-    //         console.log(e)
-    //     }
-    // }
 
 }
 

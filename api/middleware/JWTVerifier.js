@@ -28,6 +28,9 @@ const verifyToken = (req, res, next) => {
                     const newAccessToken = jwt.sign(
                         {
                         id: user.id,
+                        username: user.username,
+                        email: user.email,
+                        phone: user.phone_number,
                         isAdmin: user.isAdmin,
                         accountType: user.accountType,
                         isVerified: user.isVerified,

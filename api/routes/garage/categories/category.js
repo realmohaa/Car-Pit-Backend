@@ -14,10 +14,10 @@ router.get("/", async (req,res) => {
 })
 
 // Create A New Category
-router.post("/", async (req, res, next) => {
+router.post("/", async  (req, res, next) => {
     const { 
-        name,
-        description,
+        category_name,
+        desc,
         prefix,
         category_type
     } = req.body
@@ -36,5 +36,16 @@ router.post("/", async (req, res, next) => {
         next(CreateHTTPError(500, e))
     }
 });
+
+// Delete Category
+router.delete("/:_id", async (req,res) => {
+    const catId = req.params._id
+    try {
+        await Category.findOneAndDelete({user_id: req.user.id, _id: catId});
+        res.status(200).json({Status: "Deleted Successfully"});
+    } catch (err) {
+        res.status(500).json(err);
+    }
+})
 
 module.exports = router;

@@ -44,4 +44,24 @@ const sendOTPEmail = async (email,userId) => {
     }
 }
 
-module.exports = {sendOTPEmail}
+const sendAppointmentConfirmation = async (email, order_id, scheduled_date, body ) => {
+    try {    
+        const options = {
+            from: process.env.AUTH_EMAIL,
+            to: email,
+            subject: "Appointment Confirmation",
+            text: body
+        }
+        
+        await transporter.sendMail(options, (err, info) => {
+            if(err){
+                console.log(err)
+                return;
+            }
+        })
+    } catch (err) {
+        next(err);
+    }
+}
+
+module.exports = {sendOTPEmail, sendAppointmentConfirmation}

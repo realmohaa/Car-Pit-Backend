@@ -3,7 +3,6 @@ const Car = require("../../../models/Car");
 const CarsProvider = require("../../../providers/CarsProvider");
 const CreateHTTPError = require("http-errors");
 
-
 // Create Car For A User
 router.post("/", async (req, res, next) => {
     const { vin } = req.query;

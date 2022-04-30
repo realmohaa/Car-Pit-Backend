@@ -16,7 +16,16 @@ const loginSchema = Joi.object({
     password: Joi.string().min(8).required()
 });
 
+const garageRegSchema = Joi.object({
+    legal_name: Joi.string().min(3).max(18).lowercase().required(),
+    location: Joi.object().required(),
+    license_no: Joi.string().min(3).max(18).lowercase().required(),
+    contact_no: Joi.string().min(3).max(18).lowercase().required(),
+    services: Joi.array().required(),
+});
+
 module.exports = {
     registerationSchema,
-    loginSchema
+    loginSchema,
+    garageRegSchema
 }

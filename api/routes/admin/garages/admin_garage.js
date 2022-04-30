@@ -42,6 +42,7 @@ router.put("/approve/:userId", async (req, res,next) => {
             {$set: {accountType: 'garage'}},
             {new: true}
         );
+        
         const updtGarage = updatedGarage._doc;
         const updtUser = updateUser._doc;
         res.status(200).json({...updtUser, ...updtGarage});

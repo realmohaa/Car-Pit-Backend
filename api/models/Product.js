@@ -5,58 +5,39 @@ const ProductSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-
     title: {
         type: String,
         required: true,
     },
-
     img: {
         type: String,
-        required: true,
     },
-
     desc: {
         type: String,
         required: true,
     },
-
     category: {
         type: String,
         required: true,
     },
-
-    color: {
-        type: [],
-    },
-
-    size: {
-        type: [],
-    },
-
-    stock: {
-        type: Number,
-    },
-
+    color: {type: [],},
+    size: {type: [],},
+    stock: {type: Number,},
     retail_price: {
         type: Number,
         required: true,
     },
-
     wholesale_price: {
         type: Number,
         required: true,
     },
-
     profitInCurrency: {
         type: Number,
         percentage: Number
     },
-
     profitPercentage: {
         type: Number,
     }
-
 }, {
     timestamps: true
 })

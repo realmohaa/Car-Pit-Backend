@@ -1,22 +1,34 @@
 const mongoose = require("mongoose");
 
 const OrderSchema = new mongoose.Schema({
-    user_id: {
-        type: String,
+    user: {
+        type: {},
         required: true
     },
-
+    scheduled_date: {
+        type: String,
+        required: true,
+    },
+    client_description: {
+        type: String,
+        required: true,
+    },
+    vehicle_info: {
+        type: {}
+    },
+    services: {
+        type: [],
+        required: true
+    },
     order_id: {
         type: String,
         required: true,
         unique: true
     },
-
     garage_id: {
         type: String,
         required: true,
     },
-
     products: [
         {
             product_id: {
@@ -28,22 +40,16 @@ const OrderSchema = new mongoose.Schema({
             }
         }
     ],
-
     amount: {
         type: Number,
-        required: true
     },
-
     address: {
         type: Object, // Includes All Address Info
-        required: true,
     },
-
     status: {
         type: String,
-        default: "Pending"
+        default: "pending"
     }
-    
 }, {
     timestamps: true
 })

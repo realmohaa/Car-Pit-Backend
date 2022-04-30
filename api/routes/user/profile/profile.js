@@ -1,7 +1,9 @@
 const router = require("express").Router();
 const CryptoJs = require("crypto-js");
+const createHttpError = require("http-errors");
 const User = require("../../../models/User");
 const UserOTPVerification = require("../../../models/UserOTPVerification");
+const profileValidationScehma = require("../../../validation/profile_v_schema");
 
 // Get Profile
 router.get("/", async(req,res) => {
@@ -47,7 +49,7 @@ router.put("/verify", async (req,res) => {
 })
 
 // Update Profile
-router.put("/", async (req,res) => {
+router.put("/", async (req,res,next) => {
     if(req.body.password) {
         req.body.password = CryptoJs.AES.encrypt(
             req.body.password,
@@ -58,6 +60,13 @@ router.put("/", async (req,res) => {
     }
 
     try {
+
+        const Validator = await profileValidationScehma.validateAsync(req.body);
+
+        if (Validator.error) {
+            next(createHttpError(500,Validator.error));
+        } 
+
         const updatedUser = await User.findByIdAndUpdate(
             req.user.id, 
             {$set: req.body},
@@ -66,7 +75,8 @@ router.put("/", async (req,res) => {
         const {password, ...others } = updatedUser._doc;
         return res.status(200).json(others);
     } catch (err) {
-        res.status(500).json(err);
+        if(err?.isJoi === true) err.status = 500
+        next(err)
     }
 })
 

@@ -1,8 +1,8 @@
 const sessions = {};
 
-const createSession = (username, isAdmin) => {
+const createSession = (username, isAdmin, accountType) => {
     const sessionId = String(Object.keys(sessions).length + 1);
-    const session = { sessionId, username, valid: true, isAdmin };
+    const session = { sessionId, username, valid: true, accountType, isAdmin };
     sessions[sessionId] = session;
     return session;
 }

@@ -1,28 +1,15 @@
 const router = require("express").Router();
+const createHTTPError = require("http-errors");
 const Product = require("../../../models/Product");
-const aqp = require("api-query-params");
 const createProductSchema = require("../../../validation/product_v_schema")
 
 // All Products 
-router.get("/", async (req,res) => {
+router.get("/", async (req,res,next) => {
     try {
-        const { filter, skip, limit, sort, projection, population } = aqp(req.query);
-
-        await Product.find(filter)
-            .skip(skip)
-            .limit(limit)
-            .sort(sort)
-            .select(projection)
-            .populate(population)
-            .exec((err, products) => {
-              if (err) {
-                return next(err);
-              }
-              res.status(200).json(products)
-            });
-
+        const allProducts = await Product.find({user_id: req.user.id});
+        return res.status(200).json(allProducts);
     } catch (err) {
-        res.status(500).json({error: err})
+        next(CreateHTTPError(500, err))
     }
 })
 
@@ -36,6 +23,11 @@ router.post("/", async (req, res, next) => {
     });
     try {
         const Validator = await createProductSchema.validateAsync(req.body);
+
+        if (Validator.error) {
+            next(CreateHTTPError(500,Validator.error));
+        } 
+
         const savedProduct = await newProduct.save();
         res.status(200).json(savedProduct)
     } catch (err) {
@@ -45,36 +37,29 @@ router.post("/", async (req, res, next) => {
 })
 
 // Update Product
-router.put("/:userId", async (req, res,next) => {
-    const userId = req.params.userId
+router.put("/:_id", async (req,res,next) => {
+    const productId = req.params._id
     try {
-        const Validator = await createProductSchema.validateAsync(req.body);
-
-        if (Validator.error) {
-          next(createError(500,Validator.error));
-        } 
-
-        const updatedProduct = await Product.findOneAndUpdate(
-            {user_id: userId}, 
+        const updatedProduct = await Product.findByIdAndUpdate(
+            productId, 
             {$set: req.body},
             {new: true}
         );
         const updtProd = updatedProduct._doc;
         res.status(200).json(updtProd);
     } catch (err) {
-        if(err.isJoi === true) err.status = 422
-        next(err)
+        next(createHTTPError(500, err))
     }
 })
 
 // Delete Product
-router.delete("/:userId", async (req,res) => {
-    const userId = req.params.userId
+router.delete("/:_id", async(req,res, next) => {
+    const productId = req.params._id
     try {
-        await Product.findOneAndDelete({user_id: userId});
+        await Product.findByIdAndDelete(productId);
         res.status(200).json({Status: "Deleted Successfully"});
     } catch (err) {
-        res.status(500).json(err);
+        next(createHTTPError(500, err))
     }
 })
 
@@ -109,7 +94,7 @@ router.get("/stats", async (req, res) => {
       ]);
       res.status(200).json(data)
     } catch (err) {
-      res.status(500).json(err);
+        next(createHTTPError(500, err))
     }
   });
 

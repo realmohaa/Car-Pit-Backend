@@ -1,3 +1,4 @@
+const { string } = require("@hapi/joi");
 const mongoose = require("mongoose");
 
 const GarageSchema = new mongoose.Schema({
@@ -18,8 +19,17 @@ const GarageSchema = new mongoose.Schema({
         required: true,
     },
     location: {
-        type: Object,
-        required: true
+        country: String,
+        region: String,
+        street: String,
+        postcode: String
+    },
+    working_hours: {
+        start_time: String,
+        close_time: String  
+    },
+    rating: {
+        type: String
     },
     license_no: {
         type: String,

@@ -53,10 +53,11 @@ router.get("/stats", async (req,res) => {
 });
 
 // Update Order
-router.put("/", async (req, res,next) => {
+router.put("/:orderId", async (req, res,next) => {
+    const orderId = req.params.orderId;
     try {
-        const updatedOrder = await Order.findByIdAndUpdate(
-            req.user.id, 
+        const updatedOrder = await Order.findOneAndUpdate(
+            {order_id: orderId}, 
             {$set: req.body},
             {new: true}
         );
@@ -68,9 +69,10 @@ router.put("/", async (req, res,next) => {
 });
 
 // Delete Order
-router.delete("/", async (req,res) => {
+router.delete("/:orderId", async (req,res) => {
+    const orderId = req.params.orderId;
     try {
-        await Order.findByIdAndDelete(req.user.id);
+        await Order.findOneAndDelete({order_id: orderId});
         res.status(200).json({Status: "Deleted Successfully"});
     } catch (err) {
         res.status(500).json(err);
